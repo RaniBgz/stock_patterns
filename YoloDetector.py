@@ -8,6 +8,7 @@ import shutil
 
 #custom imports
 import BoundingBox2D as bb2d
+from Frame import Frame
 
 yolo_weights = "./yolo/weights/yoloL_90_3p.pt"
 pred_folder = "pred"
@@ -26,12 +27,12 @@ class YoloDetector:
         self.pred_folder = pred_folder
 
 
-    def detect_patterns_on_image(self, image_path, stock_name):
+    def detect_patterns_on_image(self, frame):
         #Setting the path where the predictions will be stored
-        results_path = f'{self.results_base_path}/{stock_name}/'
+        results_path = f'{self.results_base_path}/{frame.stock_name}/'
 
-        #Running prediction on the latest image for stock {stock_name}
-        results = self.model.predict(source=image_path, project=results_path, name=self.pred_folder, save=True,
+        #Running prediction on the image associated with the frame
+        results = self.model.predict(source=frame.img_path, project=results_path, name=self.pred_folder, save=True,
                                      save_txt=True)
 
         #TODO: case when no patterns are detected
@@ -41,7 +42,12 @@ class YoloDetector:
                 self.classes_dict[id]=results[0].names[id]
             print(f'Retrieved supported Yolo classes: {self.classes_dict}')
         save_dir = results[0].save_dir
+
         bounding_boxes = self.parse_predictions(save_dir)
+        if(len(bounding_boxes)==0):
+            print("No patterns have been detected")
+        else:
+            print("Patterns have been detected")
 
 
     def parse_predictions(self, save_dir):

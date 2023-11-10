@@ -12,4 +12,5 @@ class NumericalExtractor:
 
 
     def extract_pattern_start_and_end(self):
+        pass
         
