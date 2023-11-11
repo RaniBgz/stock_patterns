@@ -1,0 +1,12 @@
+*.idea/
+*/.idea/
+/__pycache__/
+/backup_results
+/BatchData
+/datasets
+/RealTimeData
+/RealTimeResults
+/runs
+/SeedData
+/venv
+/yolo
