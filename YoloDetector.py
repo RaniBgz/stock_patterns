@@ -14,11 +14,12 @@ yolo_weights = "./yolo/weights/yoloL_90_3p.pt"
 pred_folder = "pred"
 
 class YoloDetector:
-    def __init__(self, results_base_path, save_predicted_imgs):
+    # Setting paths to Yolo results
+    results_base_path = './RealTimeResults/'
+
+    def __init__(self, save_predicted_imgs):
         # Initialize the attributes of the class
         self.model = YOLO(yolo_weights)
-        #Setting path to predictions
-        self.results_base_path = results_base_path
         #If True, images with predicted bounding boxes will be saved
         self.save_predicted_imgs = save_predicted_imgs
         #Supported patterns, depends on the Yolo weights used
@@ -35,19 +36,24 @@ class YoloDetector:
         results = self.model.predict(source=frame.img_path, project=results_path, name=self.pred_folder, save=True,
                                      save_txt=True)
 
-        #TODO: case when no patterns are detected
+
         #Setting classes_dict for the first prediction
         if self.classes_dict=={}:
             for id in results[0].names:
                 self.classes_dict[id]=results[0].names[id]
             print(f'Retrieved supported Yolo classes: {self.classes_dict}')
         save_dir = results[0].save_dir
+        #TODO: extract pattern confidence
+        print(results[0])
 
         bounding_boxes = self.parse_predictions(save_dir)
         if(len(bounding_boxes)==0):
+            #Case when no patterns are detected
             print("No patterns have been detected")
         else:
             print("Patterns have been detected")
+            #If patterns are detected, convert BoundingBox2D to Patterns and add them to the Frame
+            frame.convert_bb2d_to_patterns(bounding_boxes)
 
 
     def parse_predictions(self, save_dir):
@@ -74,7 +80,7 @@ class YoloDetector:
                         bounding_boxes.append(bb)
                         print(bb.box_center)
                         print(bb.box_size)
-                        print(bb.object)
+                        print(bb.name)
         return bounding_boxes
         # Delete the "pred" folders
         # Define the path to the 'pred' folder

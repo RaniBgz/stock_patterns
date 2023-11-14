@@ -12,3 +12,9 @@ class Pattern:
         self.end_time = end_time
         self.candles = candles
         self.nb_candles = len(candles)
+
+
+    def __str__(self):
+        return f'Pattern : {self.name} was detected with confidence : {self.confidence}.' \
+               f' It started at time: {self.start_time} and ended at {self.end_time}.' \
+               f' It contains {self.nb_candles} candles'

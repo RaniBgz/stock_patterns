@@ -4,6 +4,7 @@ This class defines a OHLC Candle (+start_time and volume)
 
 class Candle:
     def __init__(self, start_time, open, high, low, close, volume):
+        #TODO: add duration
         self.start_time = start_time
         self.open = open
         self.high = high

@@ -18,11 +18,10 @@ rt_storage_path = "./RealTimeData/"
 num_rt_storage_path = rt_storage_path + "/Numerical/"
 candle_rt_storage_path = rt_storage_path + "/Candlestick/"
 
-#Setting paths to Yolo results
-results_base_path = './RealTimeResults/'
 
 #Defining stock intervals, window (in hours), stock_names to monitor (stock_name when only doing tests on one stock)
 interval = '2m'
+#Size of the
 window = 12
 stock_names = {'aapl', 'acn', 'acre'}
 stock_name = 'aapl'
@@ -34,13 +33,13 @@ res_width = 1280
 res_height = 720
 
 class BackendProcess:
-    def __init__(self, num_storage, candle_storage, interval, stock_names, stock_name, results_base_path, save_predicted_imgs):
+    def __init__(self, num_storage, candle_storage, interval, stock_names, stock_name, save_predicted_imgs):
         self.num_storage = num_storage
         self.candle_storage = candle_storage
         self.interval = interval
         self.stock_names = stock_names
         self.stock_name = stock_name
-        self.yolo_detector = yd.YoloDetector(results_base_path, save_predicted_imgs)
+        self.yolo_detector = yd.YoloDetector(save_predicted_imgs)
 
 
     def collect_tickers_and_detect(self):
@@ -95,7 +94,9 @@ class BackendProcess:
         candles = self.extract_candles_from_pandas_frame(df)
 
         # stock_name, interval, start_time, end_time, candles, nb_candles, csv_path, img_path, patterns)
-        frame = Frame(self.stock_name, self.interval, start_time, end_time, candles, len(candles), csv_path, img_path, [])
+        frame = Frame(self.stock_name, self.interval, start_time, end_time, candles, len(candles), csv_path, img_path, res_width, res_height, [])
+
+        #Printing frame information
         print(frame.__str__())
         return frame
 
@@ -156,7 +157,7 @@ class BackendProcess:
 
 
 if __name__ == '__main__':
-    backend_process = BackendProcess(num_rt_storage_path, candle_rt_storage_path, interval, stock_names, stock_name, results_base_path, save_predicted_imgs)
+    backend_process = BackendProcess(num_rt_storage_path, candle_rt_storage_path, interval, stock_names, stock_name, save_predicted_imgs)
     backend_process.collect_tickers_and_detect()
     # print("Detecting stock patterns in real-time")
     # collect_ticker(num_rt_storage_path, stock_name, interval)

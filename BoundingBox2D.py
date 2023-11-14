@@ -5,19 +5,20 @@ An instance of BoundingBox2D is a Bounding Box (annotated or detected) that
 
 
 class BoundingBox2D:
-    def __init__(self):
-        self.box_center = [0 , 0]
-        self.box_size = [0 , 0]
-        #Top left, top right, bottom left, bottom right
-        self.corners = [(0,0), (0,0), (0,0), (0,0)]
-        self.object = ""
+    # def __init__(self):
+    #     self.box_center = [0 , 0]
+    #     self.box_size = [0 , 0]
+    #     #Bottom left, top left, top right, bottom right
+    #     self.name = ""
 
-    def __init__(self, x1, y1, w, h, object):
+    def __init__(self, x1, y1, w, h, name):
         self.box_center = [x1 , y1]
         self.box_size = [w , h]
-        self.object = object
+        # Bottom left, top left, top right, bottom right
+        self.corners = [(0, 0), (0, 0), (0, 0), (0, 0)]
+        self.name = name
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f'BoxCenter : {self.box_center} BoxSize : {self.box_size}, class name: {self.object}'
 
 
@@ -30,13 +31,13 @@ class BoundingBox2D:
         half_height = height / 2
 
         # Calculate corners with clamping
+        bottom_left = (clamp(x_center - half_width), clamp(y_center + half_height))
         top_left = (clamp(x_center - half_width), clamp(y_center - half_height))
         top_right = (clamp(x_center + half_width), clamp(y_center - half_height))
-        bottom_left = (clamp(x_center - half_width), clamp(y_center + half_height))
         bottom_right = (clamp(x_center + half_width), clamp(y_center + half_height))
 
         # Update self.corners
-        self.corners = [top_left, top_right, bottom_left, bottom_right]
+        self.corners = [bottom_left, top_left, top_right, bottom_right]
 
 
 def clamp(value, min_value=0.0, max_value=1.0):
