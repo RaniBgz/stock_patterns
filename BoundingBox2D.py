@@ -11,15 +11,17 @@ class BoundingBox2D:
     #     #Bottom left, top left, top right, bottom right
     #     self.name = ""
 
-    def __init__(self, x1, y1, w, h, name):
+    def __init__(self, x1, y1, w, h, name, confidence):
         self.box_center = [x1 , y1]
         self.box_size = [w , h]
         # Bottom left, top left, top right, bottom right
         self.corners = [(0, 0), (0, 0), (0, 0), (0, 0)]
         self.name = name
+        self.confidence = confidence
+
 
     def __str__(self):
-        return f'BoxCenter : {self.box_center} BoxSize : {self.box_size}, class name: {self.object}'
+        return f'BoxCenter : {self.box_center} BoxSize : {self.box_size}, class name: {self.name}, confidence: {self.confidence}'
 
 
     def compute_corners_from_center_and_WH(self):

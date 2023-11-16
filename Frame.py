@@ -8,6 +8,7 @@ import math
 from typing import List
 from BoundingBox2D import BoundingBox2D
 from Pattern import Pattern
+from pandas import Timedelta
 
 
 class Frame:
@@ -43,12 +44,22 @@ class Frame:
             first_candle = math.floor(x1/candle_width)
             last_candle = math.ceil(x2/candle_width)
             pattern_candles = self.candles[first_candle:last_candle]
-            print(f"Pattern starts at candle {first_candle} and ends at candle {last_candle}")
-            # name, confidence, start_time, end_time, candles)
+            #When a pattern is detected at the very left of the window, we want the pattern to start at the first candle (index 0)
+            start_time = self.candles[0].start_time if first_candle == 0 else self.candles[first_candle - 1].start_time
+            end_time = self.candles[last_candle].start_time + Timedelta(minutes=self.candles[last_candle].interval.minutes)
             #TODO: Fix confidence and end time, current end-time is one-candle duration short. will need to add duration to candle or add some interval conversion
             #Patterns may be shifted by one candle
-            pattern = Pattern(bbox.name, 0, self.candles[first_candle].start_time, self.candles[last_candle].start_time, pattern_candles)
+            pattern = Pattern(bbox.name, bbox.confidence, start_time, end_time, pattern_candles)
             print(pattern.__str__())
             self.patterns.append(pattern)
 
 
+    def display_patterns_highest_high(self):
+        for pattern in self.patterns:
+            highest_high = pattern.get_highest_high()
+            print(f"Highest high of {pattern.name} = {highest_high}")
+
+    def display_patterns_lowest_low(self):
+        for pattern in self.patterns:
+            lowest_low = pattern.get_lowest_low()
+            print(f"Lowest low of {pattern.name} = {lowest_low}")
