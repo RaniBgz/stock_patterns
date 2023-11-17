@@ -1,6 +1,3 @@
-mkdir BatchData
-mkdir BatchData\Numerical
-mkdir BatchData\Candlestick
 mkdir RealTimeData
 mkdir RealTimeData\Numerical
 mkdir RealTimeData\Candlestick

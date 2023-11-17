@@ -85,7 +85,8 @@ Candle.py
 ```
 
 ### Other scripts
-I have included the scripts used to collect Batch Data that is used to re-train yolo:
+I have included the scripts used to collect Batch Data that is used to re-train yolo in data_collectors:
+The paths may have to be tweaked in the scripts to collect data.
 ``` sh
 DataCollector.py
 CoinbaseDataCollector.py

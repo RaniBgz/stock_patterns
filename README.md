@@ -35,9 +35,6 @@ pip install -r requirements.txt
 If all else fails, here are all the manual commands. You can check the requirements.txt files to see the necessary pip packages
 ### Fully manual installation:
 ``` sh
-mkdir BatchData
-mkdir BatchData\Numerical
-mkdir BatchData\Candlestick
 mkdir RealTimeData
 mkdir RealTimeData\Numerical
 mkdir RealTimeData\Candlestick
