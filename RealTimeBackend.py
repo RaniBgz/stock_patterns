@@ -8,6 +8,7 @@ import datetime as dt
 from datetime import datetime
 import time
 import plotly.graph_objects as go
+import argparse
 
 #Custom imports
 import YoloDetector as yd
@@ -20,11 +21,14 @@ rt_storage_path = "./RealTimeData/"
 num_rt_storage_path = rt_storage_path + "/Numerical/"
 candle_rt_storage_path = rt_storage_path + "/Candlestick/"
 
-#Defining stock intervals, window (in hours), stock_names to monitor (stock_name when only doing tests on one stock)
+#Defining candle duration
 interval = '2m'
 
+#Defining the size of the window (= number of hours) for each frame
+window = 12
+
 #Set the names of the stock you want to query here
-stock_names = {'aapl', 'goog', 'meta', 'nvda', 'tsla'}
+stock_names = ['aapl', 'goog', 'meta', 'nvda', 'tsla']
 
 #Switch to True to continuously parse stock(s). If interval is equal to 2min, stock/stocks will be acquired every 2m and so on
 continuous_loop = True
@@ -35,6 +39,18 @@ save_predicted_imgs = True
 #Resolution of the image that is built
 res_width = 1280
 res_height = 720
+
+# Create the parser
+# parser = argparse.ArgumentParser(description='Process some stock data.')
+#
+# # Add arguments
+# parser.add_argument('interval', type=str, help='The interval for stock data')
+# parser.add_argument('stock_names', type=str, nargs='+', help='A list of stock names')
+# parser.add_argument('--save_predicted_imgs', action='store_true', help='Flag to save predicted images')
+# parser.add_argument('--continuous_loop', action='store_true', help='Flag to keep the process running in a loop')
+#
+# # Parse the arguments
+# args = parser.parse_args()
 
 class BackendProcess:
     def __init__(self, num_storage, candle_storage, interval, stock_names, save_predicted_imgs, continuous_loop):
@@ -55,7 +71,11 @@ class BackendProcess:
     def collect_tickers_and_detect(self):
         for stock_name in self.stock_names:
             #Collects ticker, creates and stores a CSV file
-            start_time, end_time = self.collect_ticker(stock_name)
+            start_time, end_time, num_rows = self.collect_ticker(stock_name)
+
+            # Check if there is sufficient data
+            if num_rows < 10:
+                continue  # Skip to the next iteration if data is insufficient
 
             #Creates a PNG based on the CSV file, creates a Frame object for Yolo detection
             frame = self.plot_candlestick_from_time(stock_name, start_time, end_time)
@@ -81,14 +101,19 @@ class BackendProcess:
     def collect_ticker(self, stock_name):
         #Getting current time and setting start time as 1 day before the current time
         current_time = datetime.now()
-        timedelta = dt.timedelta(hours=12)
+        timedelta = dt.timedelta(hours=window)
         start_time = current_time-timedelta
 
         #Collecting data
         print(f"Collecting ticker from Yahoo Finance from {start_time} to {current_time}")
         stock = yf.Ticker(stock_name)
         data = stock.history(interval=self.interval.interval, start=start_time, end=current_time)
-        # data.head()
+
+        # Check if data is empty or has less than 8 lines of data
+        num_rows = len(data)
+        if num_rows == 0 or num_rows < 8:
+            print(f"Insufficient data for {stock_name} ({num_rows} rows). Skipping.")
+            return start_time, current_time, num_rows
 
         #Converting time format
         start_time = start_time.strftime("%Y-%m-%d_%Hh%Mm%Ss")
@@ -98,7 +123,7 @@ class BackendProcess:
             os.makedirs(f'{self.num_storage}{stock_name}/{self.interval.interval}')
         data.to_csv(f'{self.num_storage}{stock_name}/{self.interval.interval}/{stock_name}_{self.interval.interval}_{start_time}_to_{current_time}.csv')
         # print(f"Successfully stored CSV data for {stock_name} stock, from {start_date} to {end_date} with candle interval = {interval}")
-        return start_time, current_time
+        return start_time, current_time, num_rows
 
 
     def plot_candlestick_from_time(self, stock_name, start_time, end_time):
@@ -188,6 +213,3 @@ if __name__ == '__main__':
         backend_process.collect_tickers_and_detect_loop()
     else:
         backend_process.collect_tickers_and_detect()
-    # print("Detecting stock patterns in real-time")
-    # collect_ticker(num_rt_storage_path, stock_name, interval)
-    # collect_and_store_ticker(num_rt_storage_path, candle_rt_storage_path, stock_name, interval)
