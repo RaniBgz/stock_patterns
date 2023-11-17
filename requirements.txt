@@ -1,4 +1,5 @@
 pandas
 plotly
+kaleido
 yfinance
 ultralytics
